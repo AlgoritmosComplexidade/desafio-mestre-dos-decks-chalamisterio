@@ -1,0 +1,83 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+// Definição da struct Carta
+typedef struct {
+    int id;
+    char nome[50];
+    int ataque;
+    int defesa;
+    int energia;
+    char raridade[20];
+} Carta;
+
+// Função para imprimir o deck de cartas
+void imprimirDeck(Carta cartas[], int tamanho) {
+    for (int i = 0; i < tamanho; i++) {
+        printf("ID: %02d | %-20s | Atq: %3d | Def: %3d | Energia: %d | Raridade: %s\n", 
+               cartas[i].id, cartas[i].nome, cartas[i].ataque, 
+               cartas[i].defesa, cartas[i].energia, cartas[i].raridade);
+    }
+    printf("\n");
+}
+
+// Algoritmo Shell Sort para ordenar por ataque (Ordem Decrescente)
+void shellSortAtaqueDecrescente(Carta cartas[], int tamanho) {
+    // Inicializa o gap (intervalo)
+    for (int gap = tamanho / 2; gap > 0; gap /= 2) {
+        
+        // Aplica uma ordenação por inserção para este gap
+        for (int i = gap; i < tamanho; i++) {
+            Carta chave = cartas[i];
+            int j;
+            
+            // Para ordem decrescente, mudamos a condição para (cartas[j].ataque < chave.ataque)
+            for (j = i; j >= gap && cartas[j - gap].ataque < chave.ataque; j -= gap) {
+                cartas[j] = cartas[j - gap];
+            }
+            
+            cartas[j] = chave;
+        }
+    }
+}
+
+int main() {
+    const int TAMANHO = 40;
+    Carta deck[40];
+
+    // Vetores auxiliares para preencher o deck de 40 cartas de forma variada
+    char *nomes[] = {"Guerreiro", "Mago", "Dragao", "Arqueiro", "Golem", "Lich", "Fenix", "Lobo", "Cavaleiro", "Sombra"};
+    char *raridades[] = {"Comum", "Incomum", "Raro", "Epico", "Lendario"};
+
+    // Inicializando o deck com 40 cartas usando dados semi-aleatórios (baseados no índice)
+    // para garantir um cenário de teste real e desordenado
+    for (int i = 0; i < TAMANHO; i++) {
+        deck[i].id = i + 1;
+        sprintf(deck[i].nome, "%s de %s", nomes[i % 10], (i % 2 == 0 ? "Fogo" : "Gelo"));
+        
+        // Valores de ataque variados para testar a ordenação (ex: entre 10 e 100)
+        deck[i].ataque = ((i * 17) % 91) + 10; 
+        deck[i].defesa = ((i * 13) % 81) + 15;
+        deck[i].energia = (i % 7) + 1;
+        strcpy(deck[i].raridade, raridades[i % 5]);
+    }
+
+    printf("========================================\n");
+    printf("            ORDEM ORIGINAL\n");
+    printf("========================================\n");
+    imprimirDeck(deck, TAMANHO);
+
+    // Mensagem obrigatória solicitada para a ordem original
+    printf("Deck otimizado e pronto para o torneio!\n\n");
+
+    // Executa a ordenação Shell Sort
+    shellSortAtaqueDecrescente(deck, TAMANHO);
+
+    printf("========================================\n");
+    printf("   ORDEM ORDENADA (ATAQUE DECRESCENTE)\n");
+    printf("========================================\n");
+    imprimirDeck(deck, TAMANHO);
+
+    return 0;
+}

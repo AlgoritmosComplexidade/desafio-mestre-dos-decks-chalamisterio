@@ -1,0 +1,112 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+// Definição da struct Carta
+typedef struct {
+    int id;
+    char nome[50];
+    int ataque;
+    int defesa;
+    int energia;
+    char raridade[20];
+} Carta;
+
+// Função que define a lógica de ordenação e desempate
+int compararCartas(Carta a, Carta b) {
+    // 1º Critério: Ataque em ordem decrescente (maior ataque primeiro)
+    if (a.ataque != b.atk) { 
+        if (a.ataque != b.ataque) {
+            return a.ataque > b.ataque; 
+        }
+    }
+
+    // 2º Critério (Empate no ataque): Ordem alfabética do atributo RARIDADE (A-Z)
+    // strcmp retorna < 0 se a.raridade vem antes de b.raridade alfabeticamente
+    return strcmp(a.raridade, b.raridade) < 0;
+}
+
+// Função auxiliar para trocar duas cartas de posição no vetor
+void trocar(Carta* a, Carta* b) {
+    Carta temporaria = *a;
+    *a = *b;
+    *b = temporaria;
+}
+
+// Função de partição do Quick Sort
+int particionar(Carta cartas[], int baixo, int alto) {
+    Carta pivo = cartas[alto];
+    int i = (baixo - 1);
+
+    for (int j = baixo; j < alto; j++) {
+        // Aplica a função de comparação com os dois critérios
+        if (compararCartas(cartas[j], pivo)) {
+            i++;
+            trocar(&cartas[i], &cartas[j]);
+        }
+    }
+    trocar(&cartas[i + 1], &cartas[alto]);
+    return (i + 1);
+}
+
+// Algoritmo Quick Sort estruturado
+void quickSort(Carta cartas[], int baixo, int alto) {
+    if (baixo < alto) {
+        int indiceParticao = particionar(cartas, baixo, alto);
+
+        // Ordena as subpartes esquerda e direita recursivamente
+        quickSort(cartas, baixo, indiceParticao - 1);
+        quickSort(cartas, indiceParticao + 1, alto);
+    }
+}
+
+// Função para exibir o deck formatado no console
+void imprimirDeck(Carta cartas[], int tamanho) {
+    for (int i = 0; i < tamanho; i++) {
+        printf("ID: %02d | %-18s | Atq: %3d | Raridade: %-10s | Def: %2d | Energia: %d\n", 
+               cartas[i].id, cartas[i].nome, cartas[i].ataque, 
+               cartas[i].raridade, cartas[i].defesa, cartas[i].energia);
+    }
+    printf("\n");
+}
+
+int main() {
+    const int TAMANHO = 40;
+    Carta deck[40];
+
+    // Vetores de dados para gerar as 40 cartas de teste
+    char *nomes[] = {"Dragao", "Mago", "Guerreiro", "Arqueiro", "Golem", "Lich", "Fenix", "Lobo", "Cavaleiro", "Sombra"};
+    // Foram escolhidas raridades com iniciais bem distintas para testar o alfabeto (C, E, I, L, R)
+    char *raridades[] = {"Comum", "Epico", "Incomum", "Lendario", "Raro"};
+
+    // Populando o deck com dados desordenados
+    for (int i = 0; i < TAMANHO; i++) {
+        deck[i].id = i + 1;
+        sprintf(deck[i].nome, "%s de Raio", nomes[i % 10]);
+        
+        // Forçando repetição de valores de ataque para gerar empates propositais
+        // O ataque vai alternar apenas entre alguns valores fixos (ex: 20, 50, 80...)
+        deck[i].ataque = ((i % 4) * 25) + 20; 
+        
+        deck[i].defesa = ((i * 11) % 70) + 15;
+        deck[i].energia = (i % 5) + 1;
+        
+        // Distribui as raridades de forma misturada
+        strcpy(deck[i].raridade, raridades[(i * 3) % 5]); 
+    }
+
+    printf("========================================================================\n");
+    printf("                             ORDEM ORIGINAL\n");
+    printf("========================================================================\n");
+    imprimirDeck(deck, TAMANHO);
+
+    // Executa o Quick Sort em todo o vetor (do índice 0 ao 39)
+    quickSort(deck, 0, TAMANHO - 1);
+
+    printf("========================================================================\n");
+    printf("         ORDEM ORDENADA (ATAQUE DECRESCENTE + RARIDADE ALFABETICA)\n");
+    printf("========================================================================\n");
+    imprimirDeck(deck, TAMANHO);
+
+    return 0;
+}

@@ -1,0 +1,66 @@
+#include <stdio.h>
+#include <string.h>
+
+// Definição da struct Carta
+typedef struct {
+    int id;
+    char nome[50];
+    int ataque;
+    int defesa;
+    int energia;
+    char raridade[20];
+} Carta;
+
+// Função para imprimir as cartas de forma organizada
+void imprimirCartas(Carta cartas[], int tamanho) {
+    for (int i = 0; i < tamanho; i++) {
+        printf("ID: %d | %-15s | Energia: %d | Atq: %d | Def: %d | Raridade: %s\n", 
+               cartas[i].id, cartas[i].nome, cartas[i].energia, 
+               cartas[i].ataque, cartas[i].defesa, cartas[i].raridade);
+    }
+    printf("\n");
+}
+
+// Algoritmo Insertion Sort para ordenar por energia (Ordem Crescente)
+void insertionSortEnergia(Carta cartas[], int tamanho) {
+    for (int i = 1; i < tamanho; i++) {
+        Carta chave = cartas[i];
+        int j = i - 1;
+
+        // Desloca os elementos que têm energia maior que a chave
+        while (j >= 0 && cartas[j].energia > chave.energia) {
+            cartas[j + 1] = cartas[j];
+            j = j - 1;
+        }
+        cartas[j + 1] = chave;
+    }
+}
+
+int main() {
+    const int TAMANHO = 7;
+
+    // Inicializando a mão com 7 cartas de forma desordenada
+    Carta mao[7] = {
+        {1, "Dragao de Fogo", 80, 60, 5, "Raro"},
+        {2, "Guerreiro Mao", 45, 40, 2, "Comum"},
+        {3, "Mago Arcano", 70, 30, 4, "Epico"},
+        {4, "Globin Saqueador", 30, 20, 1, "Comum"},
+        {5, "Golem de Pedra", 50, 90, 6, "Raro"},
+        {6, "Fenix Lendaria", 95, 70, 7, "Lendario"},
+        {7, "Arqueiro Elfico", 40, 35, 3, "Incomum"}
+    };
+
+    printf("=== ORDEM ORIGINAL ===\n");
+    imprimirCartas(mao, TAMANHO);
+
+    // Executa a ordenação
+    insertionSortEnergia(mao, TAMANHO);
+
+    printf("=== ORDEM ORDENADA (POR ENERGIA) ===\n");
+    imprimirCartas(mao, TAMANHO);
+
+    // Mensagem final obrigatória
+    printf("Mão organizada! Pronto para a batalha!\n");
+
+    return 0;
+}
